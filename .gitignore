@@ -1,0 +1,19 @@
+# Build output
+FloweryMod/bin/
+FloweryMod/obj/
+Build/stage/
+Build/dist/
+
+# The art pipeline stays local. Both folders work only against sn0wtenkey's purchased model
+# (https://ko-fi.com/s/29867e20db), which is not ours to redistribute; the mod ships it only
+# inside the compiled asset bundle.
+FloweryRig/
+HenryUnityProject/
+
+# Reference assemblies are copied from the game install; they are not ours to redistribute.
+libs/
+
+# Editors
+.vs/
+.idea/
+*.user
