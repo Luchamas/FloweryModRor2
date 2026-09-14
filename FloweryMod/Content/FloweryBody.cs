@@ -292,9 +292,19 @@ namespace FloweryMod.Content
                 FlowerySkin.Wear(rig.gameObject, FlowerySkin.Get(rig.gameObject, characterModel.baseRendererInfos));
             }
 
-            Log.Info("Custom model is the body's model now (scale " + FloweryConfig.ModelScale.Value +
+            Log.Info("Custom model is the body's model now (scale " + ModelScale +
                      "); nothing of Loader's rig is left on it.");
         }
+
+        /// <summary>
+        /// Flowery's size inside the model object. The FBX imports about a hundred times larger than
+        /// he is in Blender, and this brings him down to a survivor's height.
+        ///
+        /// A constant, not a config entry: it belongs to the model in the asset bundle, not to the
+        /// player. It was config once, tuned by hand in a local file that never shipped, so a fresh
+        /// install fell back to the old default and got a giant Flowery.
+        /// </summary>
+        private const float ModelScale = 0.015f;
 
         /// <summary>
         /// Puts the custom model inside a vanilla model object and hands that object's
@@ -308,19 +318,18 @@ namespace FloweryMod.Content
         {
             // Stay INSIDE the model object. Everything that matters hangs off it - CharacterModel
             // drives visibility, overlays and cloaking from its own hierarchy, and moving Flowery
-            // out made him invisible. Cancel out the object's own rotation and scale so the
-            // config values are relative to plain body space; that inherited transform is what
-            // made him giant and upside-down. (StripDonor later resets the object to identity,
-            // holding him where he is, so this ends up as his plain local transform.)
+            // out made him invisible. Cancel out the object's own rotation and scale so his size
+            // is relative to plain body space; that inherited transform is what made him giant
+            // and upside-down. (StripDonor later resets the object to identity, holding him where
+            // he is, so this ends up as his plain local transform.)
             GameObject instance = Object.Instantiate(customModel, rig);
             instance.name = SkillStates.FloweryAnimations.ModelObject;
 
             Vector3 rigScale = rig.localScale;
-            float wanted = Mathf.Max(0.001f, FloweryConfig.ModelScale.Value) * scaleMultiplier;
+            float wanted = ModelScale * scaleMultiplier;
 
-            instance.transform.localPosition = FloweryConfig.ModelOffset;
-            instance.transform.localRotation = Quaternion.Inverse(rig.localRotation) *
-                                               Quaternion.Euler(FloweryConfig.ModelRotation);
+            instance.transform.localPosition = Vector3.zero;
+            instance.transform.localRotation = Quaternion.Inverse(rig.localRotation);
             instance.transform.localScale = new Vector3(
                 wanted / Mathf.Max(0.0001f, rigScale.x),
                 wanted / Mathf.Max(0.0001f, rigScale.y),

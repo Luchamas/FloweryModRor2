@@ -1,5 +1,4 @@
 ﻿using BepInEx.Configuration;
-using UnityEngine;
 
 namespace FloweryMod.Modules
 {
@@ -9,9 +8,6 @@ namespace FloweryMod.Modules
     /// </summary>
     internal static class FloweryConfig
     {
-        internal static ConfigEntry<float> ModelScale;
-        internal static ConfigEntry<string> ModelOffsetText;
-        internal static ConfigEntry<string> ModelRotationText;
         internal static ConfigEntry<float> DisplayModelScale;
         internal static ConfigEntry<bool> ModelRagdoll;
         internal static ConfigEntry<bool> ShowItemDisplays;
@@ -58,44 +54,12 @@ namespace FloweryMod.Modules
         internal static ConfigEntry<float> LastJaronaCooldown;
         internal static ConfigEntry<float> LastJaronaChargeDuration;
 
-        /// <summary>Parsed from the config string, so a bad value degrades to zero rather than throwing.</summary>
-        internal static Vector3 ModelOffset => ParseVector(ModelOffsetText);
-
-        internal static Vector3 ModelRotation => ParseVector(ModelRotationText);
-
-        private static Vector3 ParseVector(ConfigEntry<string> entry)
-        {
-            if (entry == null) return Vector3.zero;
-
-            string[] parts = entry.Value.Split(',');
-            if (parts.Length != 3) return Vector3.zero;
-
-            float x, y, z;
-            if (!float.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Float,
-                                System.Globalization.CultureInfo.InvariantCulture, out x)) return Vector3.zero;
-            if (!float.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Float,
-                                System.Globalization.CultureInfo.InvariantCulture, out y)) return Vector3.zero;
-            if (!float.TryParse(parts[2].Trim(), System.Globalization.NumberStyles.Float,
-                                System.Globalization.CultureInfo.InvariantCulture, out z)) return Vector3.zero;
-
-            return new Vector3(x, y, z);
-        }
-
         internal static void Init(ConfigFile config)
         {
-            // An imported model almost never lands at the right size or facing on the first try,
-            // so these are config rather than constants - dial them in without a rebuild.
-            ModelScale = config.Bind("00 - General", "Model Scale", 0.2f,
-                "Uniform scale applied to a custom model from the asset bundle.");
-            ModelOffsetText = config.Bind("00 - General", "Model Offset", "0, 0, 0",
-                "Local position of a custom model, as \"x, y, z\". Raise y if it sinks into the floor.");
-            ModelRotationText = config.Bind("00 - General", "Model Rotation", "0, 0, 0",
-                "Local euler rotation of a custom model, as \"x, y, z\". Use y = 180 if it faces backwards.");
-
             DisplayModelScale = config.Bind("00 - General", "Character Select Model Scale", 0.8f,
-                "Extra scale for the character-select mannequin only, multiplied on top of Model " +
-                "Scale. The select panel is framed for Loader's proportions, so Flowery needs to " +
-                "come down a little to sit in it properly. In-game size is unaffected.");
+                "Extra scale for the character-select mannequin only, multiplied on top of his " +
+                "in-game size. The select panel is framed for Loader's proportions, so Flowery needs " +
+                "to come down a little to sit in it properly. In-game size is unaffected.");
 
             ModelRagdoll = config.Bind("00 - General", "Model Ragdoll", true,
                 "Build a real ragdoll on Flowery's own skeleton, so his corpse goes limp. Set " +
@@ -118,7 +82,7 @@ namespace FloweryMod.Modules
                 "Volume of Flowery's voice clips, 0 to 1. Set to 0 to mute them. Applied on top " +
                 "of the game's Master and SFX volume sliders.");
 
-            TpBarLeftMargin = config.Bind("00 - General", "TP Bar Left Margin", 50f,
+            TpBarLeftMargin = config.Bind("00 - General", "TP Bar Left Margin", 60f,
                 "Distance from the left edge of the screen to the TP bar, in HUD units.");
             TpBarHeight = config.Bind("00 - General", "TP Bar Height", 338f,
                 "On-screen height of the TP bar, in HUD units. The width follows the artwork's " +
