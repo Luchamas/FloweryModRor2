@@ -11,12 +11,7 @@ mod: the model and animations through an asset bundle, everything else as loose 
 ## The character
 
 Flowery is the Dark World manifestation of the golden flower from Asgore's wedding bouquet.
-Watered for years, he woke up sapient, charming, and with a plan: build the perfect world for
-his gardener, bending the rules of the game if that is what it takes. Toby Fox voices him, and
-his battle theme ("Flower Man", with Camellia) has on-screen lyrics.
-
-The kit pulls from three things in that fight: the **TP** meter, the **blue SOUL charge** that
-breaks through obstacles, and **OMEGA FLOWERY**.
+His kit includes the Jarona and his OMEGA form
 
 ## Kit
 
