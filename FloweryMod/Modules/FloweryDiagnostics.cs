@@ -108,7 +108,6 @@ namespace FloweryMod.Modules
         {
             var report = new System.Collections.Generic.List<string>();
 
-            DescribeEffect(report, "swing", FloweryAssets.LashSwingEffect);
             DescribeEffect(report, "punch impact", FloweryAssets.LashHitEffect);
             DescribeEffect(report, "dash charge", FloweryAssets.JaronaChargeEffect);
             DescribeEffect(report, "dash impact", FloweryAssets.PelletHitEffect);

@@ -133,7 +133,7 @@ overlay from that same image by recolouring the red interior to rgb(255, 160, 64
 everything else. That way the fill follows the frame's slanted interior exactly instead of
 being an approximate rectangle over it, and only the percentage is drawn in code.
 
-The VFX are borrowed: Acrid's claw slash, Merc's impact spark and REX's plant explosion.
+The VFX are borrowed: Merc's impact spark and REX's plant explosion.
 
 The **model** comes out of the asset bundle, as a GameObject named `mdlFlowery`. Without it
 Flowery wears Loader's model, and the log says so. The bundle is built by

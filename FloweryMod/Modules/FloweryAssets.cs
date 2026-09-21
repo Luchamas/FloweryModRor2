@@ -27,7 +27,6 @@ namespace FloweryMod.Modules
         internal static readonly Color32 TpFillColor = new Color32(255, 160, 64, 255);
 
         // Borrowed vanilla assets. Keys verified against the shipped Addressables catalog.
-        internal static GameObject LashSwingEffect;
         internal static GameObject LashHitEffect;
         internal static GameObject PelletHitEffect;
         internal static GameObject JaronaChargeEffect;
@@ -126,11 +125,6 @@ namespace FloweryMod.Modules
 
         private static void LoadVanillaAssets()
         {
-            // Acrid's claw slash reads as a whip of vines far better than any sword swing.
-            // Note that the melee swing prefabs are not EffectCatalog entries - vanilla
-            // instantiates them onto a muzzle by hand - so this one only plays because
-            // FloweryEffects falls back to doing the same.
-            LashSwingEffect = Load<GameObject>("RoR2/Base/Croco/CrocoSlash.prefab");
             LashHitEffect = Load<GameObject>("RoR2/Base/Merc/OmniImpactVFXSlashMerc.prefab");
 
             PelletHitEffect = Load<GameObject>("RoR2/Base/Huntress/OmniImpactVFXHuntress.prefab");

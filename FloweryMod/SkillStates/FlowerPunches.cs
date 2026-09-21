@@ -72,7 +72,6 @@ namespace FloweryMod.SkillStates
             if (!attackStarted && fraction >= attackStartFraction)
             {
                 attackStarted = true;
-                SpawnSwingEffect();
             }
 
             if (attackStarted && !attackFinished)
@@ -138,22 +137,6 @@ namespace FloweryMod.SkillStates
             // has almost nothing to blend across.
             PlayPose(state, 0.05f / Mathf.Max(attackSpeedStat, 0.1f));
             SetPoseSpeed(attackSpeedStat);
-        }
-
-        private void SpawnSwingEffect()
-        {
-            if (FloweryAssets.LashSwingEffect == null || characterBody == null) return;
-
-            Ray aimRay = GetAimRay();
-            Quaternion rotation = Quaternion.LookRotation(aimRay.direction);
-            if (swingIndex % 2 != 0) rotation *= Quaternion.Euler(0f, 0f, 180f);
-
-            FloweryEffects.Spawn(FloweryAssets.LashSwingEffect, new EffectData
-            {
-                origin = characterBody.corePosition + aimRay.direction.normalized * 1.5f,
-                rotation = rotation,
-                scale = FloweryConfig.PunchRange.Value * 0.5f,
-            }, false);
         }
 
         public override void OnExit()
