@@ -2,7 +2,7 @@
 
 ![Flowery](https://raw.githubusercontent.com/Luchamas/FloweryModRor2/main/Build/readme-icons/CharSelection.png)
 
-**Flowery**, leader of the Flowers from DELTARUNE, joins the Planet as a playable survivor.
+Play as **Flowery** from the hit videogame DELTARUNE!
 
 Sorry to keep you waiting!
 
@@ -19,13 +19,7 @@ Sorry to keep you waiting!
 
 ## Taunts
 
-| Keys | Taunt |
-| --- | --- |
-| **Ctrl + 1** | Flowery flips his hair back and offers you his palm. |
-| **Ctrl + 2** | HERE I COME SAN FRANDISCO! |
-| **Ctrl + 3** | He winds up a Jarona... then shrugs and drifts backwards instead. |
-
-Moving, jumping or using a skill cancels a taunt. Rebind the keys in `BepInEx/config/com.deltarune.FloweryMod.cfg`.
+Taunt your enemies with CTRL + 1,2 or 3 !
 
 ## Credits
 - **Toby Fox** for making the Flowery character and [DELTARUNE](https://deltarune.com/) as a whole (Really great game, totally recommend it)
