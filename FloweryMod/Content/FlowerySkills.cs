@@ -32,6 +32,11 @@ namespace FloweryMod.Content
             ContentAddition.AddEntityState<OmegaFloweryState>(out added);
             ContentAddition.AddEntityState<LastJarona>(out added);
             ContentAddition.AddEntityState<FlowerySpawnState>(out added);
+            // Not skills, but networked states all the same: a taunt started on one client is
+            // sent to the others by its index in the state catalog, which this is what gives it.
+            ContentAddition.AddEntityState<HairFlipTaunt>(out added);
+            ContentAddition.AddEntityState<FrandiscoTaunt>(out added);
+            ContentAddition.AddEntityState<FeintTaunt>(out added);
         }
 
         internal static void Build(GameObject bodyPrefab)

@@ -17,6 +17,16 @@ Sorry to keep you waiting!
 | ![OMEGA FLOWERY](https://raw.githubusercontent.com/Luchamas/FloweryModRor2/main/Build/readme-icons/OmegaFlowery.png) | **OMEGA FLOWERY**<br>*Special* | Requires **75% TP**. Rise into the air, untouchable, and erupt in vines for **400%** damage plus **8%** per TP. Then become **OMEGA**: fly freely wherever you look, deal **25%** more damage, and your special becomes **LAST JARONA**. OMEGA lasts until your TP drains to 0%, up to 20 seconds on a full bar. |
 | ![LAST JARONA](https://raw.githubusercontent.com/Luchamas/FloweryModRor2/main/Build/readme-icons/LastJarona.png) | **LAST JARONA**<br>*Special, while OMEGA* | Wind up for **0.8s**, then dive into the first enemy in your path for **600%** damage and detonate for **1200%** in a wide blast. Explodes at the end of the dive even if it hits nothing. |
 
+## Taunts
+
+| Keys | Taunt |
+| --- | --- |
+| **Ctrl + 1** | Flowery flips his hair back and offers you his palm. |
+| **Ctrl + 2** | HERE I COME SAN FRANDISCO! |
+| **Ctrl + 3** | He winds up a Jarona... then shrugs and drifts backwards instead. |
+
+Moving, jumping or using a skill cancels a taunt. Rebind the keys in `BepInEx/config/com.deltarune.FloweryMod.cfg`.
+
 ## Credits
 - **Toby Fox** for making the Flowery character and [DELTARUNE](https://deltarune.com/) as a whole (Really great game, totally recommend it)
 - **[sn0wtenkey](https://ko-fi.com/s/29867e20db)**: Flowery's 3D model.

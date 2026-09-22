@@ -1,4 +1,5 @@
 ﻿using BepInEx.Configuration;
+using UnityEngine;
 
 namespace FloweryMod.Modules
 {
@@ -53,6 +54,10 @@ namespace FloweryMod.Modules
         internal static ConfigEntry<float> LastJaronaBlastDamage;
         internal static ConfigEntry<float> LastJaronaCooldown;
         internal static ConfigEntry<float> LastJaronaChargeDuration;
+
+        internal static ConfigEntry<KeyboardShortcut> TauntHairFlipKey;
+        internal static ConfigEntry<KeyboardShortcut> TauntFrandiscoKey;
+        internal static ConfigEntry<KeyboardShortcut> TauntFeintKey;
 
         internal static void Init(ConfigFile config)
         {
@@ -144,6 +149,19 @@ namespace FloweryMod.Modules
                 "Cooldown in seconds. Only usable while OMEGA.");
             LastJaronaChargeDuration = config.Bind("07 - OMEGA Special: LAST JARONA", "Charge", 0.8f,
                 "Seconds spent winding up before the punch, so it lands on \"...Jarona!\".");
+
+            // Keys are the player's business, so they are config. A modifier matches either side
+            // of the keyboard, and other keys held at the same time do not block it - see
+            // FloweryTauntInput for why BepInEx's own IsDown is not used.
+            TauntHairFlipKey = config.Bind("08 - Taunts", "Taunt 1: Hair Flip",
+                new KeyboardShortcut(KeyCode.Alpha1, KeyCode.LeftControl),
+                "Flowery flips his hair back and offers you his palm.");
+            TauntFrandiscoKey = config.Bind("08 - Taunts", "Taunt 2: Frandisco",
+                new KeyboardShortcut(KeyCode.Alpha2, KeyCode.LeftControl),
+                "Flowery strikes his HERE I COME SAN FRANDISCO pose.");
+            TauntFeintKey = config.Bind("08 - Taunts", "Taunt 3: Feint",
+                new KeyboardShortcut(KeyCode.Alpha3, KeyCode.LeftControl),
+                "Flowery winds up a Jarona, then shrugs and drifts backwards instead.");
         }
     }
 }

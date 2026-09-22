@@ -344,6 +344,22 @@ namespace FloweryMod.SkillStates
         internal const string PunchRight = "PunchR";
         internal const string PunchLeft = "PunchL";
 
+        /// <summary>
+        /// Taunt 1, the hair flip: hand on his forehead, dragged back over his crown, palm out,
+        /// and the fringe falling back down. A one-shot that ends at rest, which the taunt then
+        /// holds - see posetool's Taunt 1 section. Cape hidden: the flip swings the hand it hangs from.
+        /// </summary>
+        internal const string Taunt1 = "Taunt1";
+
+        /// <summary>Taunt 3's first half: the author's JaronaCharge wind-up, held. Cape hidden.</summary>
+        internal const string JaronaCharge = "JaronaCharge";
+
+        /// <summary>
+        /// Taunt 3's second half: the Jarona 2 shrug held still, where <see cref="Jarona2"/>
+        /// spins him. Taunt 2 has no state of its own - it is <see cref="SanFrandisco"/>. Cape hidden.
+        /// </summary>
+        internal const string Taunt3 = "Taunt3";
+
         /// <summary>Float parameter the punch states take their playback rate from.</summary>
         internal const string SpeedParameter = "PunchSpeed";
 

@@ -42,6 +42,20 @@ player who stays close to danger, and the two dashes are what get you back out.
 
 Every number lives in `BepInEx/config/com.deltarune.FloweryMod.cfg` after the first launch.
 
+## Taunts
+
+| Keys | Taunt |
+| --- | --- |
+| **Ctrl + 1** | **Hair Flip**: hand on his forehead, fringe thrown back over his head, palm offered, and the fringe falls back down. |
+| **Ctrl + 2** | **Frandisco**: the HERE I COME SAN FRANDISCO pose, held. |
+| **Ctrl + 3** | **Feint**: a Jarona wind-up for half a second, then the Jarona shrug and a short drift backwards, still facing you. |
+
+Taunts only start while Flowery is idle, and moving, jumping or any skill cancels one (the
+skill still fires). The keys are rebindable in the config's `08 - Taunts` section, and each taunt
+has its own voice lines under `Assets/Sounds/Taunt/<1|2|3>/`. A taunt lasts as long as the line it
+says is audible - trailing silence in the file does not count - or until its own animation has
+finished, whichever is longer.
+
 ## Repository layout
 
 ```

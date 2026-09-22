@@ -39,6 +39,9 @@ namespace FloweryMod.Modules
         internal const string SpecialTransform = "Special/Transform";
         internal const string SpecialLastJarona = "Special/LastJarona";
         internal const string Selected = "Selected";
+        internal const string TauntHairFlip = "Taunt/1";
+        internal const string TauntFrandisco = "Taunt/2";
+        internal const string TauntFeint = "Taunt/3";
 
         private const float MinDistance = 12f;
         private const float MaxDistance = 110f;
@@ -53,6 +56,9 @@ namespace FloweryMod.Modules
             internal float[] samples;
             internal int channels;
             internal int sampleRate;
+
+            // Seconds until the last audible moment, trailing silence cut off - see MeasureAudible.
+            internal float audibleLength;
 
             // A pinned WAV image at builtVolume, whose samples waveOut plays in place.
             internal GCHandle pinnedWav;
@@ -147,6 +153,7 @@ namespace FloweryMod.Modules
                 // decoded up front - which also reports a bad file at startup rather than mid-run.
                 Clip clip = LoadWav(file);
                 if (clip == null) continue;
+                clip.audibleLength = MeasureAudible(clip);
 
                 if (!Categories.TryGetValue(category, out List<Clip> list))
                 {
@@ -161,6 +168,15 @@ namespace FloweryMod.Modules
             {
                 Log.Warning("Sounds folder found at " + root + " but no .wav decoded.");
                 return;
+            }
+
+            // In name order, so a clip's index means the same file on every machine. A taunt picks
+            // its line on the owner's machine and sends only the index (see PickIndex), and the
+            // order Directory.GetFiles hands files back in is not promised to be anything.
+            foreach (List<Clip> list in Categories.Values)
+            {
+                list.Sort((a, b) => string.CompareOrdinal(Path.GetFileName(a.filePath),
+                                                          Path.GetFileName(b.filePath)));
             }
 
             var summary = new List<string>();
@@ -235,25 +251,147 @@ namespace FloweryMod.Modules
         /// </summary>
         internal static void PlayAt(string category, GameObject target)
         {
-            if (target == null) return;
+            PlayClipAt(Pick(category), target);
+        }
 
-            Clip clip = Pick(category);
-            if (clip == null) return;
+        /// <summary>
+        /// A random line out of <paramref name="category"/>, as an index for
+        /// <see cref="PlayAt(string, int, GameObject)"/>, or -1 when the folder is empty.
+        ///
+        /// For a state whose length depends on WHICH line it says - a taunt lasts as long as its
+        /// voice line. Each client picking its own, the way <see cref="PlayAt(string, GameObject)"/>
+        /// does, would have the owner's machine end the pose on one line's timing while another
+        /// player heard a different line cut off or trailing into silence. So the owner picks, the
+        /// state networks the index, and everyone plays the same file.
+        /// </summary>
+        internal static int PickIndex(string category)
+        {
+            if (string.IsNullOrEmpty(category)) return -1;
+            if (!Categories.TryGetValue(category, out List<Clip> list) || list.Count == 0) return -1;
+            return UnityEngine.Random.Range(0, list.Count);
+        }
+
+        /// <summary>
+        /// How long line <paramref name="index"/> of <paramref name="category"/> is actually
+        /// heard for, in seconds - the file's trailing silence left out. 0 when there is no such line.
+        /// </summary>
+        internal static float AudibleLength(string category, int index)
+        {
+            Clip clip = At(category, index);
+            return clip != null ? clip.audibleLength : 0f;
+        }
+
+        /// <summary>
+        /// Plays line <paramref name="index"/> of <paramref name="category"/> - see
+        /// <see cref="PickIndex"/> - and hands back the line so it can be cut off with
+        /// <see cref="Stop"/>. Null when nothing played: no such line, muted, or somebody else's
+        /// body on the Windows path.
+        /// </summary>
+        internal static Voice PlayAt(string category, int index, GameObject target)
+        {
+            return PlayClipAt(At(category, index), target);
+        }
+
+        /// <summary>
+        /// A line that has been started, for whatever started it to cut off. Opaque outside this
+        /// class; only <see cref="Stop"/> reads it.
+        /// </summary>
+        internal sealed class Voice
+        {
+            /// <summary>The AudioSource's holder, on the Unity path.</summary>
+            internal GameObject source;
+
+            /// <summary>Which waveOut line this was, on the Windows path; 0 for none.</summary>
+            internal int windowsLine;
+        }
+
+        /// <summary>
+        /// Cuts a line off, if it is still playing. For a state whose voice belongs to it - a taunt
+        /// that is walked out of stops talking.
+        ///
+        /// On the Windows path this only stops the device when the line on it is still THIS one.
+        /// waveOut holds one line at a time, and whatever has started since - the Jarona that
+        /// cancelled the taunt shouting its own - is not this caller's to silence.
+        /// </summary>
+        internal static void Stop(Voice voice)
+        {
+            if (voice == null) return;
+
+            if (voice.source != null)
+            {
+                UnityEngine.Object.Destroy(voice.source);
+                voice.source = null;
+            }
+
+            if (voice.windowsLine != 0 && voice.windowsLine == windowsLine) StopWindows();
+            voice.windowsLine = 0;
+        }
+
+        /// <summary>
+        /// The line most recently handed to waveOut, numbered from 1, so <see cref="Stop"/> can
+        /// tell whether the device is still playing the one it was asked about.
+        /// </summary>
+        private static int windowsLine;
+
+        private static Clip At(string category, int index)
+        {
+            if (string.IsNullOrEmpty(category) || index < 0) return null;
+            if (!Categories.TryGetValue(category, out List<Clip> list) || index >= list.Count) return null;
+            return list[index];
+        }
+
+        /// <summary>
+        /// When a line goes quiet: the end of the last 20ms stretch louder than 1% of full scale.
+        ///
+        /// The recordings carry anything up to a second of silence after the last word - Taunt2.wav
+        /// is 1.9s long and silent after 1.3 - and a pose timed to the file would stand there saying
+        /// nothing for that long. Measured on the decoded samples, so it does not care how loud the
+        /// player has the voice turned up, or whether it is muted.
+        /// </summary>
+        private static float MeasureAudible(Clip clip)
+        {
+            if (clip.samples == null || clip.channels <= 0 || clip.sampleRate <= 0) return 0f;
+
+            const float Threshold = 0.01f;
+            int window = Mathf.Max(1, clip.sampleRate / 50) * clip.channels;
+            int windows = clip.samples.Length / window;
+
+            for (int w = windows - 1; w >= 0; w--)
+            {
+                double sum = 0.0;
+                for (int i = w * window, end = i + window; i < end; i++)
+                {
+                    sum += clip.samples[i] * clip.samples[i];
+                }
+                if (Math.Sqrt(sum / window) > Threshold)
+                {
+                    return (float)(w + 1) * window / clip.channels / clip.sampleRate;
+                }
+            }
+            return 0f;
+        }
+
+        private static Voice PlayClipAt(Clip clip, GameObject target)
+        {
+            if (target == null || clip == null) return null;
 
             float volume = Volume();
-            if (volume <= 0.001f) return;
+            if (volume <= 0.001f) return null;
 
             EnsureAudioChecked();
 
             if (unityAudioUsable)
             {
-                PlayThroughUnity(clip, target, SpatialBlend, volume);
-                return;
+                return new Voice { source = PlayThroughUnity(clip, target, SpatialBlend, volume) };
             }
 
             // The Windows fallback has no positioning and cuts off whatever was playing, so
             // restrict it to the character this player is actually controlling.
-            if (IsLocalPlayerBody(target)) PlayThroughWindows(clip, volume);
+            if (IsLocalPlayerBody(target) && PlayThroughWindows(clip, volume))
+            {
+                return new Voice { windowsLine = windowsLine };
+            }
+            return null;
         }
 
         /// <summary>Plays flat, for menus.</summary>
@@ -407,8 +545,10 @@ namespace FloweryMod.Modules
         /// waveOut has no volume control that is ours alone - its volume is the whole device's -
         /// so the clip is re-encoded with its samples scaled and handed over from memory. The
         /// encoded image is cached and only rebuilt when the volume actually changes.
+        ///
+        /// True when the line is playing, which is also when it gets a new <see cref="windowsLine"/>.
         /// </summary>
-        private static void PlayThroughWindows(Clip clip, float volume)
+        private static bool PlayThroughWindows(Clip clip, float volume)
         {
             try
             {
@@ -421,7 +561,7 @@ namespace FloweryMod.Modules
                     if (!BuildScaledWav(clip, volume))
                     {
                         Log.Warning("Could not encode " + Path.GetFileName(clip.filePath) + " for playback.");
-                        return;
+                        return false;
                     }
                 }
 
@@ -440,7 +580,7 @@ namespace FloweryMod.Modules
                 {
                     waveDevice = IntPtr.Zero;
                     Log.Warning("waveOutOpen failed (" + result + ") for " + Path.GetFileName(clip.filePath) + ".");
-                    return;
+                    return false;
                 }
 
                 waveHeader = Marshal.AllocHGlobal((int)WaveHeaderSize);
@@ -456,16 +596,20 @@ namespace FloweryMod.Modules
                 {
                     Log.Warning("waveOut could not play " + Path.GetFileName(clip.filePath) + " (" + result + ").");
                     StopWindows();
-                    return;
+                    return false;
                 }
 
                 // A line can only start mid-pause from a menu, but if it does, it waits too.
                 if (PauseManager.isPaused) waveOutPause(waveDevice);
+
+                windowsLine++;
+                return true;
             }
             catch (Exception e)
             {
                 Log.Warning("Windows playback failed for " + Path.GetFileName(clip.filePath) +
                             ": " + e.Message);
+                return false;
             }
         }
 

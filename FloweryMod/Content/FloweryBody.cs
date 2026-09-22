@@ -405,6 +405,11 @@ namespace FloweryMod.Content
             {
                 BodyPrefab.AddComponent<FloweryLocomotion>();
             }
+
+            if (BodyPrefab.GetComponent<FloweryTauntInput>() == null)
+            {
+                BodyPrefab.AddComponent<FloweryTauntInput>();
+            }
         }
 
         private static void CreateMaster()
